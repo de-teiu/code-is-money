@@ -1,4 +1,40 @@
 @charset "UTF-8";
-#code-is-money-panel {
+#panel-code-is-money {
     background-color: rgb(200, 200, 200);
+    height: 32px;
+    max-height: 32px;
+    font-size: 18px;
+}
+
+#content-code-is-money {
+    width: 100%;
+    height: 100%;
+    padding-right: 10px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+}
+
+#panel-current-your-money {
+    margin-left: auto;
+    margin: auto 0;
+    width: 200px;
+    text-align: right;
+    background-color: white;
+    height: 24px;
+}
+
+#currency-unit {
+    width: 15px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+}
+
+#text-current-your-money {
+    height: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
 }
