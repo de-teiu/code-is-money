@@ -6,6 +6,8 @@ define(function (require, exports, module) {
     const ExtensionUtils = brackets.getModule("utils/ExtensionUtils");
     const infocusExtPath = ExtensionUtils.getModulePath(module);
     const AppInit = brackets.getModule("utils/AppInit");
+    const FileSystem = brackets.getModule('filesystem/FileSystem');
+    const ProjectManager = brackets.getModule('project/ProjectManager');
 
     const CurrentDat = 'current.dat';
 
@@ -64,35 +66,34 @@ define(function (require, exports, module) {
 
     }
 
-
-    function readCurrent() {
-        var temp = require('text!current.dat');
-        if (isNaN(temp)) {
-            temp = 0;
-        } else {
-            temp = Number(temp);
-        }
-        return temp;
+    function writeCurrent() {
+        var targetFile = FileSystem.getFileForPath(ProjectManager.getProjectRoot().fullPath + CurrentDat);
+        targetFile.write(String(currentGold));
     }
-    /*
-        function writeCurrent() {
-            var fs = require('fs');
-            fs.writeFile('DataFile', currentGold, function (err) {
-                console.log(err);
-            });
-        }
-    */
+
+
     function handle() {
         if (panel.isVisible()) {
-            //writeCurrent();
+            writeCurrent();
             panel.hide();
             CommandManager.get(CODEISMONEY_SHOW).setChecked(false);
         } else {
             //ここでcurrent.datから現在の金額を読み込む
-            currentGold = readCurrent();
-            document.getElementById("text-current-your-money").innerHTML = currentGold.toLocaleString();
-            panel.show();
-            CommandManager.get(CODEISMONEY_SHOW).setChecked(true);
+            var targetFile = FileSystem.getFileForPath(ProjectManager.getProjectRoot().fullPath + CurrentDat);
+            targetFile.read(function (err, content) {
+                currentGold = content;
+                if (isNaN(currentGold)) {
+                    currentGold = 0;
+                } else {
+                    currentGold = Number(currentGold);
+                }
+
+                //読み込んだらパネル表示
+                document.getElementById("text-current-your-money").innerHTML = currentGold.toLocaleString();
+                panel.show();
+                CommandManager.get(CODEISMONEY_SHOW).setChecked(true);
+            });
+
         }
     }
 
@@ -116,4 +117,4 @@ define(function (require, exports, module) {
 
 });
 
-//--------
+//----------
