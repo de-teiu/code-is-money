@@ -18,7 +18,6 @@ define(function (require, exports, module) {
     const CODEISMONEY_SHOW = "codeismoney.show";
     const COMMAND_ID = "CodeIsMoney";
 
-    const ignoreKeyList = [8, 37, 38, 39, 40, 46];
     const seFileName = 'coin00.ogg';
     const imageFileName = 'coin.gif';
     const fileSet = 20;
@@ -89,13 +88,13 @@ define(function (require, exports, module) {
 
         var keyCode = e.keyCode;
 
-        //特定のキーが入力された場合は無視
-        if (ignoreKeyList.indexOf(keyCode) >= 0) {
-            return;
+        //特定のキー以外が入力された場合のみ実行
+        if ((keyCode >= '48' && keyCode <= '90') || (keyCode >= '96' && keyCode <= '111') ||
+            keyCode == '9' || keyCode == '13' || keyCode == '32' ||
+            (keyCode >= '186' && keyCode <= '192') || (keyCode >= '219' && keyCode <= '222') || keyCode == '226') {
+            setCoinObj();
         }
 
-
-        setCoinObj();
     }
 
     function playSound() {
