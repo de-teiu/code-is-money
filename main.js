@@ -1,3 +1,9 @@
+//TODO
+//use strictをつける
+//ソースコードとコメント整理
+//金額の単位を変えられるようにする。
+//フォントとか変える？
+//たまにBrackets再起動時にフリーズするので調査
 define(function (require, exports, module) {
     require('jquery.easing.1.3');
 
