@@ -1,32 +1,33 @@
-//TODO
 //use strictをつける
 //ソースコードとコメント整理
 //金額の単位を変えられるようにする。
 //フォントとか変える？
 //たまにBrackets再起動時にフリーズするので調査
 define(function (require, exports, module) {
+    'use strict';
+
     require('jquery.easing.1.3');
 
-    const CommandManager = brackets.getModule("command/CommandManager");
-    const Menus = brackets.getModule("command/Menus");
-    const WorkspaceManager = brackets.getModule("view/WorkspaceManager");
-    const ExtensionUtils = brackets.getModule("utils/ExtensionUtils");
-    const infocusExtPath = ExtensionUtils.getModulePath(module);
-    const AppInit = brackets.getModule("utils/AppInit");
-    const FileSystem = brackets.getModule('filesystem/FileSystem');
-    const ProjectManager = brackets.getModule('project/ProjectManager');
+    var CommandManager = brackets.getModule("command/CommandManager");
+    var Menus = brackets.getModule("command/Menus");
+    var WorkspaceManager = brackets.getModule("view/WorkspaceManager");
+    var ExtensionUtils = brackets.getModule("utils/ExtensionUtils");
+    var infocusExtPath = ExtensionUtils.getModulePath(module);
+    var AppInit = brackets.getModule("utils/AppInit");
+    var FileSystem = brackets.getModule('filesystem/FileSystem');
+    var ProjectManager = brackets.getModule('project/ProjectManager');
 
-    const CurrentDat = 'current.dat';
+    var CurrentDat = 'current.dat';
 
-    const panelHtml = require("text!panel.html");
+    var panelHtml = require("text!panel.html");
     var panel;
 
-    const CODEISMONEY_SHOW = "codeismoney.show";
-    const COMMAND_ID = "CodeIsMoney";
+    var CODEISMONEY_SHOW = "codeismoney.show";
+    var COMMAND_ID = "CodeIsMoney";
 
-    const seFileName = 'coin00.ogg';
-    const imageFileName = 'coin.gif';
-    const fileSet = 20;
+    var seFileName = 'coin00.ogg';
+    var imageFileName = 'coin.gif';
+    var fileSet = 20;
 
     var currentGold = 0;
 
@@ -163,13 +164,6 @@ define(function (require, exports, module) {
         var menu = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU);
         menu.addMenuItem(CODEISMONEY_SHOW, "Ctrl-Alt-?");
         panel = WorkspaceManager.createBottomPanel(CODEISMONEY_SHOW, $(panelHtml), 48);
-
-        // Close the panel by clicking on X
-        /*
-        $('#infocus-panel .close').click(function () {
-            handle();
-        });
-        */
     });
 
 
