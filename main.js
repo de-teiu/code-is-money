@@ -14,6 +14,7 @@ define(function (require, exports, module) {
     var AppInit = brackets.getModule("utils/AppInit");
     var FileSystem = brackets.getModule('filesystem/FileSystem');
     var ProjectManager = brackets.getModule('project/ProjectManager');
+    var DocumentManager = brackets.getModule("document/DocumentManager");
 
     //この拡張機能のフルパスを取得
     var infocusExtPath = ExtensionUtils.getModulePath(module);
@@ -159,28 +160,16 @@ define(function (require, exports, module) {
         ExtensionUtils.loadStyleSheet(module, "style.css");
         CommandManager.register(COMMAND_ID, CODEISMONEY_SHOW, handle);
         var menu = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU);
-        menu.addMenuItem(CODEISMONEY_SHOW, "Ctrl-Alt-?");
+        menu.addMenuItem(CODEISMONEY_SHOW, '');
         var panelHtml = require("text!panel.html");
         panel = WorkspaceManager.createBottomPanel(CODEISMONEY_SHOW, $(panelHtml), 48);
 
+        //編集したファイルを保存したタイミングで資産も保存する
+        DocumentManager.on('documentSaved', writeCurrent);
 
         //キー入力時イベントリスナの設定
-        document.addEventListener("keydown", KeyDownFunc);
+        document.addEventListener('keyup', KeyDownFunc);
 
-        //終了時イベントリスナの設定
-        /*
-        document.addEventListener('beforeunload', function (e) {
-            writeCurrent();
-        }, false);
-        */
-
-        //拡張機能終了時に実行する関数の設定
-        /*
-        exports.unload = function () {
-            writeCurrent();
-        };
-        */
     });
-
-
 });
+//

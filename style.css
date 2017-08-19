@@ -24,8 +24,15 @@
     position: relative;
 }
 
+#assets-text {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    margin-right: 5px;
+}
+
 #currency-unit {
-    width: 15px;
     height: 100%;
     display: flex;
     align-items: center;
