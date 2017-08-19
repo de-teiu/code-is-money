@@ -6,44 +6,52 @@
 define(function (require, exports, module) {
     'use strict';
 
-    require('jquery.easing.1.3');
-
+    //Bracketsのモジュール読み込み
     var CommandManager = brackets.getModule("command/CommandManager");
     var Menus = brackets.getModule("command/Menus");
     var WorkspaceManager = brackets.getModule("view/WorkspaceManager");
     var ExtensionUtils = brackets.getModule("utils/ExtensionUtils");
-    var infocusExtPath = ExtensionUtils.getModulePath(module);
     var AppInit = brackets.getModule("utils/AppInit");
     var FileSystem = brackets.getModule('filesystem/FileSystem');
     var ProjectManager = brackets.getModule('project/ProjectManager');
 
-    var CurrentDat = 'current.dat';
+    //この拡張機能のフルパスを取得
+    var infocusExtPath = ExtensionUtils.getModulePath(module);
 
-    var panelHtml = require("text!panel.html");
-    var panel;
+    //モーション描画用のライブラリ読み込み
+    require('jquery.easing.1.3');
 
+
+    var SAVE_FILE = 'current.dat';
     var CODEISMONEY_SHOW = "codeismoney.show";
     var COMMAND_ID = "CodeIsMoney";
 
-    var seFileName = 'coin00.ogg';
-    var imageFileName = 'coin.gif';
-    var fileSet = 20;
+    var SOUND_FILE_NAME = 'coin00.ogg';
+    var SOUND_FILE_COUNT = 20;
 
-    var currentGold = 0;
+    var IMAGE_FILE_NAME = 'coin.gif';
+
+
+    var panel; //拡張機能のDOMを保持
 
     var seCount = 0;
     var se = [];
-    for (var i = 0; i < fileSet; i++) {
-        se.push(new Audio(infocusExtPath + seFileName));
+    var soundObj = new Audio(infocusExtPath + SOUND_FILE_NAME);
+    for (var i = 0; i < SOUND_FILE_COUNT; i++) {
+        se.push(soundObj);
     }
 
+    //所持金
+    var currentGold = 0;
 
+    //表示中のコインの識別番号生成用
     var coinNum = 0;
 
+    /** コインを描画して金額を加算する */
     function setCoinObj() {
         var objId = 'coin' + coinNum;
         coinNum++;
-        var imagePath = infocusExtPath + imageFileName;
+        var imagePath = infocusExtPath + IMAGE_FILE_NAME;
         $('#panel-current-your-money')
             .append(
                 '<img src="' +
@@ -85,9 +93,7 @@ define(function (require, exports, module) {
         });
     }
 
-    /**
-     * キー入力時のイベント
-     */
+    /** キー入力時のイベント */
     function KeyDownFunc(e) {
         if (!panel.isVisible()) {
             return;
@@ -96,6 +102,7 @@ define(function (require, exports, module) {
         var keyCode = e.keyCode;
 
         //特定のキー以外が入力された場合のみ実行
+        //半角英数といくつかの記号キーのみ許可している
         if ((keyCode >= '48' && keyCode <= '90') || (keyCode >= '96' && keyCode <= '111') ||
             keyCode == '9' || keyCode == '13' || keyCode == '32' ||
             (keyCode >= '186' && keyCode <= '192') || (keyCode >= '219' && keyCode <= '222') || keyCode == '226') {
@@ -104,6 +111,7 @@ define(function (require, exports, module) {
 
     }
 
+    /** 効果音再生 */
     function playSound() {
         se[seCount].play();
         seCount++;
@@ -112,25 +120,14 @@ define(function (require, exports, module) {
         }
     }
 
-
-    //キー入力時イベントリスナの設定
-    document.addEventListener("keydown", KeyDownFunc);
-    //終了時イベントリスナの設定
-    window.addEventListener('beforeunload', function (e) {
-        writeCurrent();
-    }, false);
-
+    /** 所持金をファイルに書き込み */
     function writeCurrent() {
-        var targetFile = FileSystem.getFileForPath(ProjectManager.getProjectRoot().fullPath + CurrentDat);
+        var targetFile = FileSystem.getFileForPath(ProjectManager.getProjectRoot().fullPath + SAVE_FILE);
         targetFile.write(String(currentGold));
     }
 
-    var unload = function () {
-        writeCurrent();
-    };
-    exports.unload = unload;
 
-
+    /** 拡張機能の表示/非表示切り替え */
     function handle() {
         if (panel.isVisible()) {
             writeCurrent();
@@ -138,7 +135,7 @@ define(function (require, exports, module) {
             CommandManager.get(CODEISMONEY_SHOW).setChecked(false);
         } else {
             //ここでcurrent.datから現在の金額を読み込む
-            var targetFile = FileSystem.getFileForPath(ProjectManager.getProjectRoot().fullPath + CurrentDat);
+            var targetFile = FileSystem.getFileForPath(ProjectManager.getProjectRoot().fullPath + SAVE_FILE);
             targetFile.read(function (err, content) {
                 currentGold = content;
                 if (isNaN(currentGold)) {
@@ -157,16 +154,33 @@ define(function (require, exports, module) {
     }
 
 
-
+    /** 初期化処理 */
     AppInit.appReady(function () {
         ExtensionUtils.loadStyleSheet(module, "style.css");
         CommandManager.register(COMMAND_ID, CODEISMONEY_SHOW, handle);
         var menu = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU);
         menu.addMenuItem(CODEISMONEY_SHOW, "Ctrl-Alt-?");
+        var panelHtml = require("text!panel.html");
         panel = WorkspaceManager.createBottomPanel(CODEISMONEY_SHOW, $(panelHtml), 48);
+
+
+        //キー入力時イベントリスナの設定
+        document.addEventListener("keydown", KeyDownFunc);
+
+        //終了時イベントリスナの設定
+        /*
+        document.addEventListener('beforeunload', function (e) {
+            writeCurrent();
+        }, false);
+        */
+
+        //拡張機能終了時に実行する関数の設定
+        /*
+        exports.unload = function () {
+            writeCurrent();
+        };
+        */
     });
 
 
 });
-
-//----------
