@@ -7,6 +7,7 @@ define(function (require, exports, module) {
     'use strict';
 
     //Bracketsのモジュール読み込み
+    var PreferencesManager = brackets.getModule("preferences/PreferencesManager");
     var CommandManager = brackets.getModule("command/CommandManager");
     var Menus = brackets.getModule("command/Menus");
     var WorkspaceManager = brackets.getModule("view/WorkspaceManager");
@@ -15,6 +16,7 @@ define(function (require, exports, module) {
     var FileSystem = brackets.getModule('filesystem/FileSystem');
     var ProjectManager = brackets.getModule('project/ProjectManager');
     var DocumentManager = brackets.getModule("document/DocumentManager");
+    var prefs = PreferencesManager.getExtensionPrefs("brackets-code-is-money");
 
     //この拡張機能のフルパスを取得
     var infocusExtPath = ExtensionUtils.getModulePath(module);
@@ -41,6 +43,8 @@ define(function (require, exports, module) {
     for (var i = 0; i < SOUND_FILE_COUNT; i++) {
         se.push(soundObj);
     }
+
+    var enabled = true;
 
     //所持金
     var currentGold = 0;
@@ -130,6 +134,12 @@ define(function (require, exports, module) {
 
     /** 拡張機能の表示/非表示切り替え */
     function handle() {
+
+        enabled = !enabled;
+        //現在の表示設定を保存
+        prefs.set("enabled", enabled);
+        prefs.save();
+
         if (panel.isVisible()) {
             writeCurrent();
             panel.hide();
@@ -149,9 +159,11 @@ define(function (require, exports, module) {
                 document.getElementById("text-current-your-money").innerHTML = currentGold.toLocaleString();
                 panel.show();
                 CommandManager.get(CODEISMONEY_SHOW).setChecked(true);
+
             });
 
         }
+
     }
 
 
@@ -170,6 +182,21 @@ define(function (require, exports, module) {
         //キー入力時イベントリスナの設定
         document.addEventListener('keyup', KeyDownFunc);
 
+
+        //表示・非表示の設定情報を読み込む
+        if (prefs.get("enabled") === "undefined") {
+            prefs.definePreference("enabled", "boolean", true);
+        } else {
+            enabled = prefs.get("enabled");
+        }
+
+        if (!enabled) {
+            return;
+        }
+
+        //ONになっていたら拡張機能のパネル表示
+        enabled = false;
+        handle();
     });
 });
 //
