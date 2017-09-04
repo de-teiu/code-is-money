@@ -1,10 +1,10 @@
 {
     "name": "code is money",
     "title": "Code is money",
-    "description": "write simple code and gain money.",
+    "description": "write code and gain money.",
     "keywords": ["money"],
     "homepage": "https://github.com/de-teiu/code-is-money",
-    "version": "0.0.1",
+    "version": "0.0.5",
     "author": ["DE-TEIU"],
     "license": "MIT",
     "engines": {

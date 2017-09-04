@@ -1,8 +1,4 @@
-//use strictをつける
-//ソースコードとコメント整理
-//金額の単位を変えられるようにする。
-//フォントとか変える？
-//たまにBrackets再起動時にフリーズするので調査
+/** コードを書くと金が増えるBrackets拡張機能です。 */
 define(function (require, exports, module) {
     'use strict';
 
@@ -25,7 +21,8 @@ define(function (require, exports, module) {
     require('jquery.easing.1.3');
 
 
-    var SAVE_FILE = 'current.dat';
+    var SAVE_PARAM = 'currentGold';
+    var ENABLED_PARAM = 'enabled';
     var CODEISMONEY_SHOW = "codeismoney.show";
     var COMMAND_ID = "CodeIsMoney";
 
@@ -127,8 +124,8 @@ define(function (require, exports, module) {
 
     /** 所持金をファイルに書き込み */
     function writeCurrent() {
-        var targetFile = FileSystem.getFileForPath(ProjectManager.getProjectRoot().fullPath + SAVE_FILE);
-        targetFile.write(String(currentGold));
+        prefs.set(SAVE_PARAM, currentGold);
+        prefs.save();
     }
 
 
@@ -137,7 +134,7 @@ define(function (require, exports, module) {
 
         enabled = !enabled;
         //現在の表示設定を保存
-        prefs.set("enabled", enabled);
+        prefs.set(ENABLED_PARAM, enabled);
         prefs.save();
 
         if (panel.isVisible()) {
@@ -145,22 +142,13 @@ define(function (require, exports, module) {
             panel.hide();
             CommandManager.get(CODEISMONEY_SHOW).setChecked(false);
         } else {
-            //ここでcurrent.datから現在の金額を読み込む
-            var targetFile = FileSystem.getFileForPath(ProjectManager.getProjectRoot().fullPath + SAVE_FILE);
-            targetFile.read(function (err, content) {
-                currentGold = content;
-                if (isNaN(currentGold)) {
-                    currentGold = 0;
-                } else {
-                    currentGold = Number(currentGold);
-                }
+            //設定情報から現在の金額を読み込み
+            currentGold = prefs.get(SAVE_PARAM);
 
-                //読み込んだらパネル表示
-                document.getElementById("text-current-your-money").innerHTML = currentGold.toLocaleString();
-                panel.show();
-                CommandManager.get(CODEISMONEY_SHOW).setChecked(true);
-
-            });
+            //読み込んだらパネル表示
+            document.getElementById("text-current-your-money").innerHTML = currentGold.toLocaleString();
+            panel.show();
+            CommandManager.get(CODEISMONEY_SHOW).setChecked(true);
 
         }
 
@@ -176,7 +164,12 @@ define(function (require, exports, module) {
         var panelHtml = require("text!panel.html");
         panel = WorkspaceManager.createBottomPanel(CODEISMONEY_SHOW, $(panelHtml), 48);
 
-        //編集したファイルを保存したタイミングで資産も保存する
+        if (prefs.get(SAVE_PARAM) == null) {
+            prefs.definePreference(SAVE_PARAM, "number", 0);
+            currentGold = 0;
+        }
+
+        //編集したファイルを保存したタイミングで所持金も保存する
         DocumentManager.on('documentSaved', writeCurrent);
 
         //キー入力時イベントリスナの設定
@@ -184,10 +177,10 @@ define(function (require, exports, module) {
 
 
         //表示・非表示の設定情報を読み込む
-        if (prefs.get("enabled") === "undefined") {
-            prefs.definePreference("enabled", "boolean", true);
+        if (prefs.get(ENABLED_PARAM) == null) {
+            prefs.definePreference(ENABLED_PARAM, "boolean", true);
         } else {
-            enabled = prefs.get("enabled");
+            enabled = prefs.get(ENABLED_PARAM);
         }
 
         if (!enabled) {
