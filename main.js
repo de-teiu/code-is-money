@@ -20,14 +20,13 @@ define(function (require, exports, module) {
     //モーション描画用のライブラリ読み込み
     require('jquery.easing.1.3');
 
-
     var SAVE_PARAM = 'currentGold';
     var ENABLED_PARAM = 'enabled';
     var CODEISMONEY_SHOW = "codeismoney.show";
     var COMMAND_ID = "CodeIsMoney";
 
     var SOUND_FILE_NAME = 'coin00.ogg';
-    var SOUND_FILE_COUNT = 20;
+    var SOUND_FILE_COUNT = 30;
 
     var IMAGE_FILE_NAME = 'coin.gif';
 
@@ -36,8 +35,8 @@ define(function (require, exports, module) {
 
     var seCount = 0;
     var se = [];
-    var soundObj = new Audio(infocusExtPath + SOUND_FILE_NAME);
     for (var i = 0; i < SOUND_FILE_COUNT; i++) {
+        var soundObj = new Audio(infocusExtPath + SOUND_FILE_NAME);
         se.push(soundObj);
     }
 
