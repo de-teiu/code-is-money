@@ -1,7 +1,7 @@
 {
     "name": "code is money",
     "title": "Code is money",
-    "description": "write code and gain money.",
+    "description": "コードを書くと金が増える気分になる.",
     "keywords": ["money"],
     "homepage": "https://github.com/de-teiu/code-is-money",
     "version": "0.0.5",
